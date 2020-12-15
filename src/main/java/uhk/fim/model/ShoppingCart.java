@@ -35,4 +35,8 @@ public class ShoppingCart {
         }
         return sum;
     }
+
+    public void setItems(List<ShoppingCartItem> items) {
+        this.items = items;
+    }
 }

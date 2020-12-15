@@ -1,7 +1,9 @@
 package uhk.fim;
 
+import uhk.fim.database.DBInitializer;
 import uhk.fim.gui.MainFrame;
 import javax.swing.*;
+import java.sql.SQLException;
 
 public class Main {
 
@@ -13,5 +15,15 @@ public class Main {
                 mainFrame.setVisible(true);
             }
         });
+/*
+        DBInitializer dbInitializer = new DBInitializer("org.apache.derby.jdbc.EmbeddedDriver", "jdbc:derby:SampleDB;create=true");
+        try {
+            dbInitializer.init();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+ */
     }
 }

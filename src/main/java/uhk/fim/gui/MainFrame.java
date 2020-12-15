@@ -10,6 +10,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import uhk.fim.database.CsvDataManager;
+import uhk.fim.database.DataManager;
+import uhk.fim.database.JdbcDataManager;
 import uhk.fim.model.ShoppingCart;
 import uhk.fim.model.ShoppingCartItem;
 
@@ -19,6 +22,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
+import java.sql.SQLException;
 
 public class MainFrame extends JFrame implements ActionListener {
     JPanel panelMain;
@@ -34,6 +38,8 @@ public class MainFrame extends JFrame implements ActionListener {
     ShoppingCart shoppingCart;
     ShoppingCartTableModel shoppingCartTableModel;
 
+    DataManager dataManager;
+    final String STORAGE_FILE_CSV = "src/main/resources/storage.csv";
 
     public MainFrame(int width, int height) {
         super("PRO2 - Shopping cart");
@@ -42,15 +48,22 @@ public class MainFrame extends JFrame implements ActionListener {
 
         // Vytvoříme košík (data)
         shoppingCart = new ShoppingCart();
+
+        // Načteme data ze zdroje
+        try {
+            dataManager = new JdbcDataManager("org.apache.derby.jdbc.EmbeddedDriver", "jdbc:derby:SampleDB");
+            //dataManager = new CsvDataManager(STORAGE_FILE_CSV);
+            shoppingCart.setItems(dataManager.getAllShoppingCartItems());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         // Vytvoříme model
         shoppingCartTableModel = new ShoppingCartTableModel();
         // Propojíme model s košíkem (data)
         shoppingCartTableModel.setShoppingCart(shoppingCart);
 
         initGUI();
-
-        shoppingCart.addItem(new ShoppingCartItem("xx", 50, 1));
-        shoppingCartTableModel.fireTableDataChanged();
 
         updateFooter();
     }
@@ -174,6 +187,9 @@ public class MainFrame extends JFrame implements ActionListener {
                     shoppingCartTableModel.fireTableDataChanged();
                     // Upravit patičku
                     updateFooter();
+
+                    // Uložíme do DB
+                    dataManager.addShoppingCartItem(item);
                 } else {
                     JOptionPane.showMessageDialog(this, "Cena musí být větší než 0", "Chyba", JOptionPane.ERROR_MESSAGE);
                 }
